@@ -42,6 +42,7 @@ func main() {
 	// writes each pixel with r/g/b values
 	// from top left to bottom right
 	for j := 0; j < ny; j++ {
+		fmt.Printf("Lines remaining: %v\n", (ny - j))
 		for i := 0; i < nx; i++ {
 			// red and green values range from
 			// 0.0 to 1.0
