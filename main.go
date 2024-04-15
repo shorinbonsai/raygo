@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"image"
+	"image/color"
+	"image/png"
 	"os"
 )
 
@@ -14,10 +17,10 @@ func check(e error, s string) {
 
 func main() {
 	// size of image x and y
-	nx := 400
-	ny := 300
+	nx := 256
+	ny := 256
 
-	const color = 255.99
+	const ccolor = 255.999
 
 	f, err := os.Create("out.ppm")
 
@@ -30,24 +33,35 @@ func main() {
 
 	check(err, "Error writting to file: %v\n")
 
+	pngFile, err := os.Create("out.png")
+	check(err, "Error creating PNG file: %v\n")
+	defer pngFile.Close()
+
+	img := image.NewRGBA(image.Rect(0, 0, nx, ny))
+
 	// writes each pixel with r/g/b values
 	// from top left to bottom right
-	for j := ny - 1; j >= 0; j-- {
+	for j := 0; j < ny; j++ {
 		for i := 0; i < nx; i++ {
 			// red and green values range from
 			// 0.0 to 1.0
 			r := float64(i) / float64(nx)
 			g := float64(j) / float64(ny)
-			b := 0.2
+			b := 0.0
 
 			// get intensity of colors
-			ir := int(color * r)
-			ig := int(color * g)
-			ib := int(color * b)
+			ir := uint8(ccolor * r)
+			ig := uint8(ccolor * g)
+			ib := uint8(ccolor * b)
+
+			img.Set(i, j, color.RGBA{ir, ig, ib, 255})
 
 			_, err = fmt.Fprintf(f, "%d %d %d\n", ir, ig, ib)
 
 			check(err, "Error writting to file: %v\n")
 		}
 	}
+	err = png.Encode(pngFile, img)
+	check(err, "Error encoding PNG: %v\n")
+
 }
